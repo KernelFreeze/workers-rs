@@ -133,18 +133,17 @@ impl Response {
     }
 
     /// Create an empty `Response` with a 200 status code.
-    pub fn empty() -> Result<Self> {
-        Ok(Self {
+    pub fn empty() -> Self {
+        Self {
             body: ResponseBody::Empty,
             headers: Headers::new(),
             status_code: 200,
-        })
+        }
     }
 
     /// Sets an empty `Response`
-    pub fn set_empty(&mut self) -> Result<()> {
+    pub fn set_empty(&mut self) {
         self.body = ResponseBody::Empty;
-        Ok(())
     }
 
     /// A helper method to send an error message to a client. Will return `Err` if the status code
