@@ -110,26 +110,24 @@ impl Response {
 
     /// Create a `Response` using unprocessed text provided. Sets the associated `Content-Type`
     /// header for the `Response` as `text/plain`.
-    pub fn set_text(&mut self, body: impl Into<String>) -> Result<()> {
+    pub fn set_text(&mut self, body: impl Into<String>) {
         let headers = self.headers_mut();
-        headers.set(CONTENT_TYPE, "text/plain")?;
+        headers.set(CONTENT_TYPE, "text/plain").unwrap();
 
         self.body = ResponseBody::Body(body.into().into_bytes());
-
-        Ok(())
     }
 
     /// Create a `Response` using unprocessed text provided. Sets the associated `Content-Type`
     /// header for the `Response` as `text/plain`.
-    pub fn ok(body: impl Into<String>) -> Result<Self> {
+    pub fn ok(body: impl Into<String>) -> Self {
         let mut headers = Headers::new();
-        headers.set(CONTENT_TYPE, "text/plain")?;
+        headers.set(CONTENT_TYPE, "text/plain").unwrap();
 
-        Ok(Self {
+        Self {
             body: ResponseBody::Body(body.into().into_bytes()),
             headers,
             status_code: 200,
-        })
+        }
     }
 
     /// Create an empty `Response` with a 200 status code.
@@ -248,9 +246,8 @@ impl Response {
     }
 
     /// Add a header to this response.
-    pub fn set_header(&mut self, name: &str, value: &str) -> Result<()> {
-        self.headers_mut().set(name, value)?;
-        Ok(())
+    pub fn set_header(&mut self, name: &str, value: &str) {
+        self.headers_mut().set(name, value).unwrap();
     }
 
     /// Read the `Headers` on this response.
