@@ -192,6 +192,13 @@ impl Response {
         self
     }
 
+    /// Set this response's status code.
+    /// The Workers platform will reject HTTP status codes outside the range of 200..599 inclusive,
+    /// and will throw a JavaScript `RangeError`, returning a response with an HTTP 500 status code.
+    pub fn set_status(&mut self, status_code: u16) {
+        self.status_code = status_code;
+    }
+
     /// Read the `Headers` on this response.
     pub fn headers(&self) -> &Headers {
         &self.headers
