@@ -41,6 +41,18 @@ impl Response {
 
         Err(Error::Json(("Failed to encode data to json".into(), 500)))
     }
+    /// Create a `Response` using `B` as the body encoded as JSON. Sets the associated
+    /// `Content-Type` header for the `Response` as `application/json`.
+    pub fn set_json<B: Serialize>(&mut self, value: &B) -> Result<Self> {
+        if let Ok(data) = serde_json::to_string(value) {
+            let mut headers = Headers::new();
+            headers.set(CONTENT_TYPE, "application/json")?;
+
+            self.body = ResponseBody::Body(data.into_bytes());
+        }
+
+        Err(Error::Json(("Failed to encode data to json".into(), 500)))
+    }
 
     /// Create a `Response` using the body encoded as HTML. Sets the associated `Content-Type`
     /// header for the `Response` as `text/html`.
@@ -69,6 +81,17 @@ impl Response {
         })
     }
 
+    /// Create a `Response` using unprocessed bytes provided. Sets the associated `Content-Type`
+    /// header for the `Response` as `application/octet-stream`.
+    pub fn set_bytes(&mut self, bytes: Vec<u8>) -> Result<()> {
+        let mut headers = Headers::new();
+        headers.set(CONTENT_TYPE, "application/octet-stream")?;
+
+        self.body = ResponseBody::Body(bytes);
+
+        Ok(())
+    }
+
     // Create a `Response` using a `ResponseBody` variant. Sets a status code of 200 and an empty
     // set of Headers. Modify the Response with methods such as `with_status` and `with_headers`.
     pub fn from_body(body: ResponseBody) -> Result<Self> {
@@ -77,6 +100,23 @@ impl Response {
             headers: Headers::new(),
             status_code: 200,
         })
+    }
+
+    // Create a `Response` using a `ResponseBody` variant. Sets a status code of 200 and an empty
+    // set of Headers. Modify the Response with methods such as `with_status` and `with_headers`.
+    pub fn set_body(&mut self, body: ResponseBody) {
+        self.body = body;
+    }
+
+    /// Create a `Response` using unprocessed text provided. Sets the associated `Content-Type`
+    /// header for the `Response` as `text/plain`.
+    pub fn set_text(&mut self, body: impl Into<String>) -> Result<()> {
+        let headers = self.headers_mut();
+        headers.set(CONTENT_TYPE, "text/plain")?;
+
+        self.body = ResponseBody::Body(body.into().into_bytes());
+
+        Ok(())
     }
 
     /// Create a `Response` using unprocessed text provided. Sets the associated `Content-Type`
@@ -99,6 +139,12 @@ impl Response {
             headers: Headers::new(),
             status_code: 200,
         })
+    }
+
+    /// Sets an empty `Response`
+    pub fn set_empty(&mut self) -> Result<()> {
+        self.body = ResponseBody::Empty;
+        Ok(())
     }
 
     /// A helper method to send an error message to a client. Will return `Err` if the status code
