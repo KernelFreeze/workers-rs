@@ -322,8 +322,10 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
         .get("/status/:code", |_, ctx| {
             if let Some(code) = ctx.param("code") {
                 return match code.parse::<u16>() {
-                    Ok(status) => Response::ok("You set the status code!")
-                        .map(|resp| resp.with_status(status)),
+                    Ok(status) => Response::ok("You set the status code!").map(|mut resp| {
+                        resp.set_status(status);
+                        resp
+                    }),
                     Err(_e) => Response::error("Failed to parse your status code.", 400),
                 };
             }
@@ -377,7 +379,10 @@ pub async fn main(req: Request, env: Env) -> Result<Response> {
             Fetch::Url("https://github.com/404".parse().unwrap())
                 .send()
                 .await
-                .map(|resp| resp.with_status(404))
+                .map(|mut resp| {
+                    resp.set_status(404);
+                    resp
+                })
         })
         .run(req, env)
         .await
