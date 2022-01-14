@@ -41,6 +41,7 @@ impl Response {
 
         Err(Error::Json(("Failed to encode data to json".into(), 500)))
     }
+
     /// Create a `Response` using `B` as the body encoded as JSON. Sets the associated
     /// `Content-Type` header for the `Response` as `application/json`.
     pub fn set_json<B: Serialize>(&mut self, value: &B) -> Result<Self> {
@@ -50,6 +51,17 @@ impl Response {
 
             self.body = ResponseBody::Body(data.into_bytes());
         }
+
+        Err(Error::Json(("Failed to encode data to json".into(), 500)))
+    }
+
+    /// Create a `Response` using `B` as the body encoded as JSON. Sets the associated
+    /// `Content-Type` header for the `Response` as `application/json`.
+    pub fn set_json_text(&mut self, value: impl Into<String>) -> Result<Self> {
+        let mut headers = Headers::new();
+        headers.set(CONTENT_TYPE, "application/json")?;
+
+        self.body = ResponseBody::Body(value.into().into_bytes());
 
         Err(Error::Json(("Failed to encode data to json".into(), 500)))
     }
