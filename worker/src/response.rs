@@ -57,13 +57,11 @@ impl Response {
 
     /// Create a `Response` using `B` as the body encoded as JSON. Sets the associated
     /// `Content-Type` header for the `Response` as `application/json`.
-    pub fn set_json_text(&mut self, value: impl Into<String>) -> Result<Self> {
+    pub fn set_json_text(&mut self, value: impl Into<String>) {
         let mut headers = Headers::new();
-        headers.set(CONTENT_TYPE, "application/json")?;
+        headers.set(CONTENT_TYPE, "application/json").unwrap();
 
         self.body = ResponseBody::Body(value.into().into_bytes());
-
-        Err(Error::Json(("Failed to encode data to json".into(), 500)))
     }
 
     /// Create a `Response` using the body encoded as HTML. Sets the associated `Content-Type`
